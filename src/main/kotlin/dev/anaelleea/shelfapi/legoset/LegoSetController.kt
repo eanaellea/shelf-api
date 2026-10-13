@@ -44,6 +44,10 @@ class LegoSetController(private val service: LegoSetService) {
     fun update(@PathVariable setNumber: String, @Valid @RequestBody request: UpdateLegoSetRequest) =
         service.update(setNumber, request)
 
+    /** Public: lets a guest claim a wishlisted set as their gift, so nobody else buys it too. */
+    @PostMapping("/{setNumber}/gift")
+    fun gift(@PathVariable setNumber: String) = service.gift(setNumber)
+
     @DeleteMapping("/{setNumber}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable setNumber: String) = service.delete(setNumber)

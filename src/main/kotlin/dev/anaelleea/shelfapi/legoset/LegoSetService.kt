@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientException
+import java.time.Instant
 
 @Service
 @Transactional(readOnly = true)
@@ -60,6 +61,20 @@ class LegoSetService(
         val legoSet = getOrThrow(normalize(setNumber))
         legoSet.status = request.status
         return legoSets.saveAndFlush(legoSet).toResponse()
+    }
+
+    /**
+     * WISHLIST -> GIFTED in one conditional update, so when two guests gift the same set at once,
+     * only the first succeeds and the second gets a conflict.
+     */
+    @Transactional
+    fun gift(setNumber: String): LegoSetResponse {
+        val normalized = normalize(setNumber)
+        if (legoSets.updateStatusIf(normalized, from = LegoSetStatus.WISHLIST, to = LegoSetStatus.GIFTED, now = Instant.now()) == 0) {
+            getOrThrow(normalized) // 404 when the set isn't on the shelf
+            throw LegoSetNotOnWishlistException(normalized)
+        }
+        return getOrThrow(normalized).toResponse()
     }
 
     @Transactional

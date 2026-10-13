@@ -12,6 +12,13 @@ class LegoSetNotFoundException(setNumber: String) :
 class LegoSetAlreadyExistsException(setNumber: String) :
     ErrorResponseException(HttpStatus.CONFLICT, problem(HttpStatus.CONFLICT, "LEGO set $setNumber already exists"), null)
 
+class LegoSetNotOnWishlistException(setNumber: String) :
+    ErrorResponseException(
+        HttpStatus.CONFLICT,
+        problem(HttpStatus.CONFLICT, "LEGO set $setNumber is not on the wishlist (it may already be gifted)"),
+        null,
+    )
+
 class UnknownLegoSetException(setNumber: String) :
     ErrorResponseException(
         HttpStatus.UNPROCESSABLE_CONTENT,

@@ -1,6 +1,8 @@
 package dev.anaelleea.shelfapi.catalog
 
+import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
+import dev.anaelleea.shelfapi.asOwner
 import dev.anaelleea.shelfapi.legoset.LegoSet
 import dev.anaelleea.shelfapi.legoset.LegoSetRepository
 import dev.anaelleea.shelfapi.legoset.LegoSetStatus
@@ -27,7 +29,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.client.ResourceAccessException
 
-@SpringBootTest
+@SpringBootTest(properties = [OWNER_UID_PROPERTY])
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration::class)
 class CatalogControllerTests @Autowired constructor(
@@ -99,6 +101,12 @@ class CatalogControllerTests @Autowired constructor(
             .hasContentType(MediaType.APPLICATION_PROBLEM_JSON)
     }
 
-    private fun search(query: String) = mvc.get().uri("/api/catalog/sets?search={query}", query).exchange()
+    @Test
+    fun `is reserved to the owner`() {
+        assertThat(mvc.get().uri("/api/catalog/sets?search=botanical")).hasStatus(HttpStatus.UNAUTHORIZED)
+    }
+
+    private fun search(query: String) =
+        mvc.get().uri("/api/catalog/sets?search={query}", query).with(asOwner()).exchange()
 
 }

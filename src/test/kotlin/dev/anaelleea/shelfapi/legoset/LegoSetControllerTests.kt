@@ -1,6 +1,9 @@
 package dev.anaelleea.shelfapi.legoset
 
+import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
+import dev.anaelleea.shelfapi.asOtherUser
+import dev.anaelleea.shelfapi.asOwner
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
 import dev.anaelleea.shelfapi.rebrickable.RebrickableSet
 import dev.anaelleea.shelfapi.rebrickable.RebrickableTheme
@@ -21,7 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.client.HttpClientErrorException
 
-@SpringBootTest
+@SpringBootTest(properties = [OWNER_UID_PROPERTY])
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration::class)
 class LegoSetControllerTests @Autowired constructor(
@@ -109,26 +112,88 @@ class LegoSetControllerTests @Autowired constructor(
     fun `updates the status`() {
         add("10281", "QUEUED")
 
-        val result = mvc.patch().uri("/api/lego-sets/10281-1")
-            .contentType(MediaType.APPLICATION_JSON).content("""{"status": "BUILT"}""")
-
-        assertThat(result).hasStatusOk().bodyJson().extractingPath("$.status").isEqualTo("BUILT")
+        assertThat(updateStatus("10281-1", "BUILT").with(asOwner()))
+            .hasStatusOk().bodyJson().extractingPath("$.status").isEqualTo("BUILT")
     }
 
     @Test
     fun `deletes a set`() {
         add("10281", "QUEUED")
 
-        assertThat(mvc.delete().uri("/api/lego-sets/10281-1")).hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(mvc.delete().uri("/api/lego-sets/10281-1").with(asOwner())).hasStatus(HttpStatus.NO_CONTENT)
         assertThat(mvc.get().uri("/api/lego-sets/10281-1"))
             .hasStatus(HttpStatus.NOT_FOUND)
             .hasContentType(MediaType.APPLICATION_PROBLEM_JSON)
     }
 
-    private fun add(setNumber: String, status: String) =
+    @Test
+    fun `lets guests browse the shelf`() {
+        add("10281", "WISHLIST")
+
+        assertThat(mvc.get().uri("/api/lego-sets")).hasStatusOk()
+        assertThat(mvc.get().uri("/api/lego-sets/10281-1")).hasStatusOk()
+    }
+
+    @Test
+    fun `reserves changes to the owner`() {
+        add("10281", "WISHLIST")
+
+        assertThat(addRequest("10311", "QUEUED")).hasStatus(HttpStatus.UNAUTHORIZED)
+        assertThat(addRequest("10311", "QUEUED").with(asOtherUser())).hasStatus(HttpStatus.FORBIDDEN)
+        assertThat(updateStatus("10281-1", "BUILT")).hasStatus(HttpStatus.UNAUTHORIZED)
+        assertThat(updateStatus("10281-1", "BUILT").with(asOtherUser())).hasStatus(HttpStatus.FORBIDDEN)
+        assertThat(mvc.delete().uri("/api/lego-sets/10281-1")).hasStatus(HttpStatus.UNAUTHORIZED)
+        assertThat(mvc.delete().uri("/api/lego-sets/10281-1").with(asOtherUser())).hasStatus(HttpStatus.FORBIDDEN)
+        assertThat(legoSets.findBySetNumber("10281-1")?.status).isEqualTo(LegoSetStatus.WISHLIST)
+    }
+
+    @Test
+    fun `lets a guest gift a wishlisted set`() {
+        add("10281", "WISHLIST")
+
+        assertThat(mvc.post().uri("/api/lego-sets/10281/gift"))
+            .hasStatusOk().bodyJson().extractingPath("$.status").isEqualTo("GIFTED")
+    }
+
+    @Test
+    fun `refuses to gift a set twice`() {
+        add("10281", "WISHLIST")
+        mvc.post().uri("/api/lego-sets/10281-1/gift").exchange()
+
+        assertThat(mvc.post().uri("/api/lego-sets/10281-1/gift"))
+            .hasStatus(HttpStatus.CONFLICT)
+            .hasContentType(MediaType.APPLICATION_PROBLEM_JSON)
+    }
+
+    @Test
+    fun `refuses to gift a set that is not on the wishlist`() {
+        add("10281", "BUILT")
+
+        assertThat(mvc.post().uri("/api/lego-sets/10281-1/gift")).hasStatus(HttpStatus.CONFLICT)
+        assertThat(mvc.post().uri("/api/lego-sets/99999-1/gift")).hasStatus(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `answers CORS preflight requests without a token`() {
+        val preflight = mvc.options().uri("/api/lego-sets")
+            .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "authorization,content-type")
+
+        assertThat(preflight).hasStatusOk()
+            .headers().hasValue(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173")
+    }
+
+    private fun add(setNumber: String, status: String) = addRequest(setNumber, status).with(asOwner()).exchange()
+
+    private fun addRequest(setNumber: String, status: String) =
         mvc.post().uri("/api/lego-sets")
             .contentType(MediaType.APPLICATION_JSON)
             .content("""{"setNumber": "$setNumber", "status": "$status"}""")
-            .exchange()
+
+    private fun updateStatus(setNumber: String, status: String) =
+        mvc.patch().uri("/api/lego-sets/{setNumber}", setNumber)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"status": "$status"}""")
 
 }
