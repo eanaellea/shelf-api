@@ -1,5 +1,7 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.legoset.dto
 
+import dev.anaelleea.shelfapi.legoset.model.LegoSet
+import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
 import jakarta.validation.constraints.Pattern
 import java.time.Instant
 

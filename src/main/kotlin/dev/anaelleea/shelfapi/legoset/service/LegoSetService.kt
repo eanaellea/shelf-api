@@ -1,6 +1,20 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.legoset.service
 
+import dev.anaelleea.shelfapi.legoset.dto.AddLegoSetRequest
+import dev.anaelleea.shelfapi.legoset.dto.LegoSetResponse
+import dev.anaelleea.shelfapi.legoset.dto.UpdateLegoSetRequest
+import dev.anaelleea.shelfapi.legoset.dto.toResponse
+import dev.anaelleea.shelfapi.legoset.exception.LegoSetAlreadyExistsException
+import dev.anaelleea.shelfapi.legoset.exception.LegoSetNotFoundException
+import dev.anaelleea.shelfapi.legoset.exception.LegoSetNotOnWishlistException
+import dev.anaelleea.shelfapi.legoset.exception.UnknownLegoSetException
+import dev.anaelleea.shelfapi.legoset.model.LegoSet
+import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
+import dev.anaelleea.shelfapi.legoset.model.LegoTheme
+import dev.anaelleea.shelfapi.legoset.repository.LegoSetRepository
+import dev.anaelleea.shelfapi.legoset.repository.LegoThemeRepository
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
+import dev.anaelleea.shelfapi.rebrickable.RebrickableUnavailableException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException

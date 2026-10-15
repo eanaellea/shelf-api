@@ -1,5 +1,10 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.legoset.controller
 
+import dev.anaelleea.shelfapi.legoset.dto.AddLegoSetRequest
+import dev.anaelleea.shelfapi.legoset.dto.LegoSetResponse
+import dev.anaelleea.shelfapi.legoset.dto.UpdateLegoSetRequest
+import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
+import dev.anaelleea.shelfapi.legoset.service.LegoSetService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort

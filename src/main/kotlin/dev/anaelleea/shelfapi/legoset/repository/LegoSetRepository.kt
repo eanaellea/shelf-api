@@ -1,5 +1,7 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.legoset.repository
 
+import dev.anaelleea.shelfapi.legoset.model.LegoSet
+import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
@@ -31,5 +33,3 @@ interface LegoSetRepository : JpaRepository<LegoSet, Long> {
     fun findSetNumbersIn(setNumbers: Collection<String>): List<String>
 
 }
-
-interface LegoThemeRepository : JpaRepository<LegoTheme, Int>
