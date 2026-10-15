@@ -1,9 +1,12 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.legoset.controller
 
 import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asOtherUser
 import dev.anaelleea.shelfapi.asOwner
+import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
+import dev.anaelleea.shelfapi.legoset.repository.LegoSetRepository
+import dev.anaelleea.shelfapi.legoset.repository.LegoThemeRepository
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
 import dev.anaelleea.shelfapi.rebrickable.RebrickableSet
 import dev.anaelleea.shelfapi.rebrickable.RebrickableTheme

@@ -1,4 +1,4 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.legoset.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -25,8 +25,5 @@ class UnknownLegoSetException(setNumber: String) :
         problem(HttpStatus.UNPROCESSABLE_CONTENT, "Rebrickable has no LEGO set $setNumber"),
         null,
     )
-
-class RebrickableUnavailableException(cause: Throwable) :
-    ErrorResponseException(HttpStatus.BAD_GATEWAY, problem(HttpStatus.BAD_GATEWAY, "Rebrickable request failed"), cause)
 
 private fun problem(status: HttpStatus, detail: String) = ProblemDetail.forStatusAndDetail(status, detail)
