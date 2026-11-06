@@ -16,7 +16,7 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
  * The shelf is a public gift registry: anyone can browse it and mark a wishlisted set as gifted.
  * Everything else is reserved to the owner, identified by the Firebase ID token's subject (the user's UID).
  */
-@Configuration(proxyBeanMethods = false)
+@Configuration
 class SecurityConfig(
     @Value("\${shelf.owner-uid}") private val ownerUid: String,
 ) {
@@ -31,6 +31,9 @@ class SecurityConfig(
                 authorize(HttpMethod.GET, "/api/lego-sets/**", permitAll)
                 authorize(HttpMethod.POST, "/api/lego-sets/*/gift", permitAll)
                 authorize("/api/**", owner)
+                authorize("/v3/api-docs/**", permitAll)
+                authorize("/swagger-ui.html", permitAll)
+                authorize("/swagger-ui/**", permitAll)
                 authorize("/error", permitAll)
                 authorize(anyRequest, denyAll)
             }
