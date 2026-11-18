@@ -144,6 +144,7 @@ class ShelfControllerTests @Autowired constructor(
         // Bob can add the same set to his own shelf...
         assertThat(add(bob, "10281", "WISHLIST")).hasStatus(HttpStatus.CREATED)
         // ...but can't see or change Alice's copy.
+        assertThat(mvc.get().uri("/api/me/lego-sets/10311-1").with(asUser(bob))).hasStatus(HttpStatus.NOT_FOUND)
         assertThat(updateStatus("10311-1", "BUILT").with(asUser(bob))).hasStatus(HttpStatus.NOT_FOUND)
         assertThat(mvc.delete().uri("/api/me/lego-sets/10311-1").with(asUser(bob))).hasStatus(HttpStatus.NOT_FOUND)
         assertThat(mvc.get().uri("/api/shelves/alice/lego-sets/10311-1"))
