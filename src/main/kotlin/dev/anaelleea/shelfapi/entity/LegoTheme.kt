@@ -1,4 +1,4 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.Id

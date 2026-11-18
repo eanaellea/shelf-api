@@ -1,4 +1,4 @@
-package dev.anaelleea.shelfapi.catalog
+package dev.anaelleea.shelfapi.dto
 
 /** A set from the Rebrickable catalog, as returned by search. */
 data class CatalogSetResponse(

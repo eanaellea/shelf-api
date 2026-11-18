@@ -1,4 +1,4 @@
-package dev.anaelleea.shelfapi.rebrickable
+package dev.anaelleea.shelfapi.client
 
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam

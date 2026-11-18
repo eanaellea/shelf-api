@@ -1,17 +1,17 @@
-package dev.anaelleea.shelfapi.catalog
+package dev.anaelleea.shelfapi.controller
 
 import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asOwner
-import dev.anaelleea.shelfapi.legoset.LegoSet
-import dev.anaelleea.shelfapi.legoset.LegoSetRepository
-import dev.anaelleea.shelfapi.legoset.LegoSetStatus
-import dev.anaelleea.shelfapi.legoset.LegoTheme
-import dev.anaelleea.shelfapi.legoset.LegoThemeRepository
-import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
-import dev.anaelleea.shelfapi.rebrickable.RebrickablePage
-import dev.anaelleea.shelfapi.rebrickable.RebrickableSet
-import dev.anaelleea.shelfapi.rebrickable.RebrickableTheme
+import dev.anaelleea.shelfapi.client.RebrickableApi
+import dev.anaelleea.shelfapi.client.RebrickablePage
+import dev.anaelleea.shelfapi.client.RebrickableSet
+import dev.anaelleea.shelfapi.client.RebrickableTheme
+import dev.anaelleea.shelfapi.entity.LegoSet
+import dev.anaelleea.shelfapi.entity.LegoTheme
+import dev.anaelleea.shelfapi.model.LegoSetStatus
+import dev.anaelleea.shelfapi.repository.LegoSetRepository
+import dev.anaelleea.shelfapi.repository.LegoThemeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

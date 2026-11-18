@@ -1,5 +1,6 @@
-package dev.anaelleea.shelfapi.catalog
+package dev.anaelleea.shelfapi.controller
 
+import dev.anaelleea.shelfapi.service.CatalogService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag

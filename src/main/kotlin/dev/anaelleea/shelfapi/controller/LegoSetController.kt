@@ -1,5 +1,10 @@
-package dev.anaelleea.shelfapi.legoset
+package dev.anaelleea.shelfapi.controller
 
+import dev.anaelleea.shelfapi.dto.AddLegoSetRequest
+import dev.anaelleea.shelfapi.dto.LegoSetResponse
+import dev.anaelleea.shelfapi.dto.UpdateLegoSetRequest
+import dev.anaelleea.shelfapi.model.LegoSetStatus
+import dev.anaelleea.shelfapi.service.LegoSetService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag

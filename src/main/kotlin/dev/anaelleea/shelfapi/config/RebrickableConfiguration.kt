@@ -1,5 +1,6 @@
-package dev.anaelleea.shelfapi.rebrickable
+package dev.anaelleea.shelfapi.config
 
+import dev.anaelleea.shelfapi.client.RebrickableApi
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.service.registry.ImportHttpServices
 
