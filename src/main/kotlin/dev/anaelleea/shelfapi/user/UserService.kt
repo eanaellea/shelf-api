@@ -1,5 +1,6 @@
 package dev.anaelleea.shelfapi.user
 
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +21,11 @@ class UserService(private val users: UserRepository) {
         if (users.existsByFirebaseUid(request.firebaseUid)) throw UserAlreadyExistsException(request.firebaseUid)
         if (users.existsByHandle(request.handle)) throw HandleTakenException(request.handle)
 
-        return users.saveAndFlush(User(request.firebaseUid, request.handle)).toResponse()
+        return try {
+            users.saveAndFlush(User(request.firebaseUid, request.handle)).toResponse()
+        } catch (e: DataIntegrityViolationException) {
+            throw UserAlreadyExistsException(request.firebaseUid) // invited concurrently, e.g. a double-click
+        }
     }
 
 }
