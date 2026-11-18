@@ -1,8 +1,9 @@
 package dev.anaelleea.shelfapi.catalog
 
-import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
+import dev.anaelleea.shelfapi.ADMIN_HANDLE_PROPERTY
+import dev.anaelleea.shelfapi.ADMIN_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
-import dev.anaelleea.shelfapi.asOwner
+import dev.anaelleea.shelfapi.asUser
 import dev.anaelleea.shelfapi.legoset.LegoSet
 import dev.anaelleea.shelfapi.legoset.LegoSetRepository
 import dev.anaelleea.shelfapi.legoset.LegoSetStatus
@@ -12,6 +13,8 @@ import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
 import dev.anaelleea.shelfapi.rebrickable.RebrickablePage
 import dev.anaelleea.shelfapi.rebrickable.RebrickableSet
 import dev.anaelleea.shelfapi.rebrickable.RebrickableTheme
+import dev.anaelleea.shelfapi.user.User
+import dev.anaelleea.shelfapi.user.UserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,13 +32,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.client.ResourceAccessException
 
-@SpringBootTest(properties = [OWNER_UID_PROPERTY])
+@SpringBootTest(properties = [ADMIN_UID_PROPERTY, ADMIN_HANDLE_PROPERTY])
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration::class)
 class CatalogControllerTests @Autowired constructor(
     private val mvc: MockMvcTester,
     private val legoSets: LegoSetRepository,
     private val themes: LegoThemeRepository,
+    private val users: UserRepository,
 ) {
 
     @MockitoBean
@@ -43,10 +47,14 @@ class CatalogControllerTests @Autowired constructor(
 
     private val bonsaiImage = "https://cdn.rebrickable.com/media/sets/10281-1/148031.jpg"
 
+    private lateinit var alice: User
+
     @BeforeEach
     fun setUp() {
         legoSets.deleteAll()
         themes.deleteAll()
+        users.deleteAll()
+        alice = users.save(User("alice-uid", "alice"))
         given(rebrickable.searchSets("botanical", "-year", 20)).willReturn(
             RebrickablePage(
                 listOf(
@@ -61,9 +69,11 @@ class CatalogControllerTests @Autowired constructor(
     }
 
     @Test
-    fun `searches Rebrickable and marks sets already on the shelf`() {
+    fun `searches Rebrickable and marks sets already on my shelf`() {
         val theme = themes.save(LegoTheme(721, "Botanical Collection"))
-        legoSets.save(LegoSet("10281-1", "Bonsai Tree", theme, 2021, 878, bonsaiImage, LegoSetStatus.BUILT))
+        val bob = users.save(User("bob-uid", "bob"))
+        legoSets.save(LegoSet(alice, "10281-1", "Bonsai Tree", theme, 2021, 878, bonsaiImage, LegoSetStatus.BUILT))
+        legoSets.save(LegoSet(bob, "10311-1", "Orchid", theme, 2022, 608, null, LegoSetStatus.BUILT)) // not on my shelf
 
         assertThat(search("botanical")).hasStatusOk().bodyJson().isLenientlyEqualTo(
             """
@@ -102,11 +112,13 @@ class CatalogControllerTests @Autowired constructor(
     }
 
     @Test
-    fun `is reserved to the owner`() {
+    fun `is reserved to signed-in invited users`() {
         assertThat(mvc.get().uri("/api/catalog/sets?search=botanical")).hasStatus(HttpStatus.UNAUTHORIZED)
+        assertThat(mvc.get().uri("/api/catalog/sets?search=botanical").with(asUser("not-invited")))
+            .hasStatus(HttpStatus.FORBIDDEN)
     }
 
     private fun search(query: String) =
-        mvc.get().uri("/api/catalog/sets?search={query}", query).with(asOwner()).exchange()
+        mvc.get().uri("/api/catalog/sets?search={query}", query).with(asUser(alice.firebaseUid)).exchange()
 
 }

@@ -1,0 +1,35 @@
+databaseChangeLog:
+  # Invited users. Each user has one shelf.
+  - changeSet:
+      id: 003-create-users
+      author: anaelle
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              # Firebase UIDs are at most 128 characters
+              - column:
+                  name: firebase_uid
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+                    unique: true
+              # Used in public shelf URLs, e.g. 'anaelle'
+              - column:
+                  name: handle
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false

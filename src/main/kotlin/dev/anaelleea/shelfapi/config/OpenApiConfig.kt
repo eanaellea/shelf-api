@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 
 /**
  * Serves the API description at /v3/api-docs and Swagger UI at /swagger-ui.html.
- * Owner-only endpoints take a Firebase ID token, which can be pasted into Swagger UI's "Authorize" dialog.
+ * Endpoints for signed-in users take a Firebase ID token, which can be pasted into Swagger UI's "Authorize" dialog.
  */
 @Configuration
 class OpenApiConfig {
@@ -20,7 +20,7 @@ class OpenApiConfig {
             .type(SecurityScheme.Type.HTTP)
             .scheme("bearer")
             .bearerFormat("JWT")
-            .description("Firebase ID token of the shelf owner")
+            .description("Firebase ID token of an invited user")
 
         return OpenAPI()
             .info(Info().title("Shelf API").version("v1"))

@@ -1,0 +1,52 @@
+databaseChangeLog:
+  # The admin's own user. ${admin-uid} and ${admin-handle} come from spring.liquibase.parameters
+  # in application.properties.
+  - changeSet:
+      id: 004-insert-admin-user
+      author: anaelle
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: firebase_uid
+                  value: ${admin-uid}
+              - column:
+                  name: handle
+                  value: ${admin-handle}
+
+  # Every set now belongs to a user. The sets added before this change go to the admin.
+  - changeSet:
+      id: 004-add-lego-sets-user-id
+      author: anaelle
+      changes:
+        - addColumn:
+            tableName: lego_sets
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: lego_sets_user_id_fkey
+                    references: users(id)
+        - sql:
+            sql: >
+              update lego_sets
+              set user_id = (select id from users where firebase_uid = '${admin-uid}');
+        - addNotNullConstraint:
+            tableName: lego_sets
+            columnName: user_id
+
+  # A set number is now unique per shelf instead of across the whole table,
+  # so two users can both have the same set.
+  - changeSet:
+      id: 004-make-set-number-unique-per-user
+      author: anaelle
+      changes:
+        - dropUniqueConstraint:
+            tableName: lego_sets
+            constraintName: lego_sets_set_number_key
+        - addUniqueConstraint:
+            tableName: lego_sets
+            columnNames: user_id, set_number
+            constraintName: lego_sets_user_id_set_number_key

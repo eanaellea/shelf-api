@@ -1,6 +1,7 @@
 package dev.anaelleea.shelfapi.legoset
 
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
+import dev.anaelleea.shelfapi.user.User
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
@@ -22,25 +23,26 @@ class LegoSetService(
     private val rebrickable: RebrickableApi,
 ) {
 
-    fun findAll(status: LegoSetStatus?, pageable: Pageable): Page<LegoSetResponse> {
-        val page = if (status == null) legoSets.findAll(pageable) else legoSets.findAllByStatus(status, pageable)
+    fun findAll(user: User, status: LegoSetStatus?, pageable: Pageable): Page<LegoSetResponse> {
+        val page = if (status == null) legoSets.findAllByUser(user, pageable) else legoSets.findAllByUserAndStatus(user, status, pageable)
         return page.map { it.toResponse() }
     }
 
-    fun find(setNumber: String): LegoSetResponse = getOrThrow(normalize(setNumber)).toResponse()
+    fun find(user: User, setNumber: String): LegoSetResponse = getOrThrow(user, normalize(setNumber)).toResponse()
 
     // Not transactional: Rebrickable calls shouldn't hold a database connection open.
     // Each repository save runs in its own transaction.
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    fun add(request: AddLegoSetRequest): LegoSetResponse {
+    fun add(user: User, request: AddLegoSetRequest): LegoSetResponse {
         val setNumber = normalize(request.setNumber)
-        if (legoSets.existsBySetNumber(setNumber)) throw LegoSetAlreadyExistsException(setNumber)
+        if (legoSets.existsByUserAndSetNumber(user, setNumber)) throw LegoSetAlreadyExistsException(setNumber)
 
         val catalogSet = callRebrickable(setNumber) { rebrickable.getSet(setNumber) }
         val theme = themes.findByIdOrNull(catalogSet.themeId)
             ?: themes.save(callRebrickable(setNumber) { rebrickable.getTheme(catalogSet.themeId) }.let { LegoTheme(it.id, it.name) })
 
         val legoSet = LegoSet(
+            user = user,
             setNumber = catalogSet.setNum,
             name = catalogSet.name,
             theme = theme,
@@ -57,8 +59,8 @@ class LegoSetService(
     }
 
     @Transactional
-    fun update(setNumber: String, request: UpdateLegoSetRequest): LegoSetResponse {
-        val legoSet = getOrThrow(normalize(setNumber))
+    fun update(user: User, setNumber: String, request: UpdateLegoSetRequest): LegoSetResponse {
+        val legoSet = getOrThrow(user, normalize(setNumber))
         legoSet.status = request.status
         return legoSets.saveAndFlush(legoSet).toResponse()
     }
@@ -68,22 +70,22 @@ class LegoSetService(
      * only the first succeeds and the second gets a conflict.
      */
     @Transactional
-    fun gift(setNumber: String): LegoSetResponse {
+    fun gift(user: User, setNumber: String): LegoSetResponse {
         val normalized = normalize(setNumber)
-        if (legoSets.updateStatusIf(normalized, from = LegoSetStatus.WISHLIST, to = LegoSetStatus.GIFTED, now = Instant.now()) == 0) {
-            getOrThrow(normalized) // 404 when the set isn't on the shelf
+        if (legoSets.updateStatusIf(user, normalized, from = LegoSetStatus.WISHLIST, to = LegoSetStatus.GIFTED, now = Instant.now()) == 0) {
+            getOrThrow(user, normalized) // 404 when the set isn't on the shelf
             throw LegoSetNotOnWishlistException(normalized)
         }
-        return getOrThrow(normalized).toResponse()
+        return getOrThrow(user, normalized).toResponse()
     }
 
     @Transactional
-    fun delete(setNumber: String) {
-        legoSets.delete(getOrThrow(normalize(setNumber)))
+    fun delete(user: User, setNumber: String) {
+        legoSets.delete(getOrThrow(user, normalize(setNumber)))
     }
 
-    private fun getOrThrow(setNumber: String): LegoSet =
-        legoSets.findBySetNumber(setNumber) ?: throw LegoSetNotFoundException(setNumber)
+    private fun getOrThrow(user: User, setNumber: String): LegoSet =
+        legoSets.findByUserAndSetNumber(user, setNumber) ?: throw LegoSetNotFoundException(setNumber)
 
     private fun <T> callRebrickable(setNumber: String, call: () -> T): T =
         try {
