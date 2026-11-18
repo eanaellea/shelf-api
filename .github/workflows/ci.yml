@@ -35,7 +35,7 @@ jobs:
       cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write # to push the deploy tag
       id-token: write
     env:
       IMAGE: europe-west1-docker.pkg.dev/shelf-24dc6/shelf-api/shelf-api:${{ github.sha }}
@@ -81,3 +81,9 @@ jobs:
             --allow-unauthenticated
             --memory=1Gi
             --max-instances=2
+
+      # Tags the deployed commit, so the newest deploy-* tag on GitHub is what's live.
+      - run: |
+          TAG="deploy-$(date -u +%Y-%m-%d)-${{ github.run_number }}"
+          git tag "$TAG"
+          git push origin "$TAG"
