@@ -22,3 +22,68 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew build
+
+  # After a merge to main, once the tests pass: builds the image, pushes it to Artifact Registry
+  # and deploys it to Cloud Run. Signs in to Google Cloud with the GitHub OIDC token through
+  # workload identity federation, so there is no Google key to store.
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # One deploy at a time, so a newer merge can't be overwritten by an older one finishing last.
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to push the deploy tag
+      id-token: write
+    env:
+      IMAGE: europe-west1-docker.pkg.dev/shelf-24dc6/shelf-api/shelf-api:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - run: ./gradlew bootJar
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deployer@shelf-24dc6.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+
+      - run: docker build --tag "$IMAGE" . && docker push "$IMAGE"
+
+      # The database connection and the Rebrickable key come from Secret Manager.
+      - uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: shelf-api
+          region: europe-west1
+          image: ${{ env.IMAGE }}
+          env_vars: |
+            SHELF_ADMIN_UID=XoWNTvPduVNAl7SadEBeIPKsZyr2
+            SHELF_CORS_ALLOWED_ORIGINS=https://shelf-24dc6.web.app,https://shelf-24dc6.firebaseapp.com
+          secrets: |
+            SPRING_DATASOURCE_URL=shelf-db-url:latest
+            REBRICKABLE_API_KEY=rebrickable-api-key:latest
+          # Public API (guests have no token); 1 GiB is comfortable for Spring Boot;
+          # at most 2 instances keeps the bill and the database connections small.
+          flags: >-
+            --service-account=shelf-api@shelf-24dc6.iam.gserviceaccount.com
+            --allow-unauthenticated
+            --memory=1Gi
+            --max-instances=2
+
+      # Tags the deployed commit, so the newest deploy-* tag on GitHub is what's live.
+      - run: |
+          TAG="deploy-$(date -u +%Y-%m-%d)-${{ github.run_number }}"
+          git tag "$TAG"
+          git push origin "$TAG"

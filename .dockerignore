@@ -1,0 +1,3 @@
+# Only the built jar goes into the image; keep everything else (and local secrets) out.
+*
+!build/libs/*.jar
