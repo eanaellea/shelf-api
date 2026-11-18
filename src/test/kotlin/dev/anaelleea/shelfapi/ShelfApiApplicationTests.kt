@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 
-@SpringBootTest(properties = [ADMIN_UID_PROPERTY, ADMIN_HANDLE_PROPERTY])
+@SpringBootTest(properties = [ADMIN_UID_PROPERTY])
 @Import(TestcontainersConfiguration::class)
 class ShelfApiApplicationTests {
 

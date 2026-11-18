@@ -1,6 +1,5 @@
 package dev.anaelleea.shelfapi.legoset
 
-import dev.anaelleea.shelfapi.ADMIN_HANDLE_PROPERTY
 import dev.anaelleea.shelfapi.ADMIN_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asUser
@@ -27,7 +26,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.client.HttpClientErrorException
 
 /** Covers both a user's own shelf (/api/me/lego-sets) and the public shelves (/api/shelves/{handle}/lego-sets). */
-@SpringBootTest(properties = [ADMIN_UID_PROPERTY, ADMIN_HANDLE_PROPERTY])
+@SpringBootTest(properties = [ADMIN_UID_PROPERTY])
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration::class)
 class ShelfControllerTests @Autowired constructor(

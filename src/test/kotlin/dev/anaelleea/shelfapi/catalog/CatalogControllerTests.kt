@@ -1,6 +1,5 @@
 package dev.anaelleea.shelfapi.catalog
 
-import dev.anaelleea.shelfapi.ADMIN_HANDLE_PROPERTY
 import dev.anaelleea.shelfapi.ADMIN_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asUser
@@ -32,7 +31,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 import org.springframework.web.client.ResourceAccessException
 
-@SpringBootTest(properties = [ADMIN_UID_PROPERTY, ADMIN_HANDLE_PROPERTY])
+@SpringBootTest(properties = [ADMIN_UID_PROPERTY])
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration::class)
 class CatalogControllerTests @Autowired constructor(

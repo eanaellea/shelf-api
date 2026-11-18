@@ -1,6 +1,5 @@
 package dev.anaelleea.shelfapi.user
 
-import dev.anaelleea.shelfapi.ADMIN_HANDLE_PROPERTY
 import dev.anaelleea.shelfapi.ADMIN_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asAdmin
@@ -17,7 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.assertj.MockMvcTester
 
-@SpringBootTest(properties = [ADMIN_UID_PROPERTY, ADMIN_HANDLE_PROPERTY])
+@SpringBootTest(properties = [ADMIN_UID_PROPERTY])
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration::class)
 class UserControllerTests @Autowired constructor(

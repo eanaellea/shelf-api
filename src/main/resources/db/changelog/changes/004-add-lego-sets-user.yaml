@@ -1,6 +1,5 @@
 databaseChangeLog:
-  # The admin's own user. ${admin-uid} and ${admin-handle} come from spring.liquibase.parameters
-  # in application.properties.
+  # The admin's own user (Anaelle), who owns every set added before multiple users existed.
   - changeSet:
       id: 004-insert-admin-user
       author: anaelle
@@ -10,10 +9,10 @@ databaseChangeLog:
             columns:
               - column:
                   name: firebase_uid
-                  value: ${admin-uid}
+                  value: XoWNTvPduVNAl7SadEBeIPKsZyr2
               - column:
                   name: handle
-                  value: ${admin-handle}
+                  value: eanaellea
 
   # Every set now belongs to a user. The sets added before this change go to the admin.
   - changeSet:
@@ -32,7 +31,7 @@ databaseChangeLog:
         - sql:
             sql: >
               update lego_sets
-              set user_id = (select id from users where firebase_uid = '${admin-uid}');
+              set user_id = (select id from users where firebase_uid = 'XoWNTvPduVNAl7SadEBeIPKsZyr2');
         - addNotNullConstraint:
             tableName: lego_sets
             columnName: user_id
