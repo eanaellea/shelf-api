@@ -145,6 +145,9 @@ class ShelfControllerTests @Autowired constructor(
         assertThat(add(bob, "10281", "WISHLIST")).hasStatus(HttpStatus.CREATED)
         // ...but can't see or change Alice's copy.
         assertThat(updateStatus("10311-1", "BUILT").with(asUser(bob))).hasStatus(HttpStatus.NOT_FOUND)
+        assertThat(mvc.delete().uri("/api/me/lego-sets/10311-1").with(asUser(bob))).hasStatus(HttpStatus.NOT_FOUND)
+        assertThat(mvc.get().uri("/api/shelves/alice/lego-sets/10311-1"))
+            .hasStatusOk().bodyJson().extractingPath("$.status").isEqualTo("QUEUED")
         assertThat(mvc.get().uri("/api/me/lego-sets").with(asUser(bob)))
             .hasStatusOk().bodyJson()
             .hasPathSatisfying("$.content[*].status") { assertThat(it).isEqualTo(listOf("WISHLIST")) }
