@@ -1,5 +1,6 @@
 package dev.anaelleea.shelfapi.legoset
 
+import dev.anaelleea.shelfapi.user.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -18,6 +19,11 @@ import java.time.Instant
 @Entity
 @Table(name = "lego_sets")
 class LegoSet(
+    /** The user whose shelf this set is on. */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
+    val user: User,
+
     var setNumber: String,
     var name: String,
 

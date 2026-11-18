@@ -5,6 +5,7 @@ import dev.anaelleea.shelfapi.legoset.LegoTheme
 import dev.anaelleea.shelfapi.legoset.LegoThemeRepository
 import dev.anaelleea.shelfapi.legoset.RebrickableUnavailableException
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
+import dev.anaelleea.shelfapi.user.User
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,12 +19,13 @@ class CatalogService(
     private val themes: LegoThemeRepository,
 ) {
 
-    fun search(query: String): List<CatalogSetResponse> {
+    /** Searches Rebrickable, flagging the sets already on [user]'s shelf. */
+    fun search(user: User, query: String): List<CatalogSetResponse> {
         if (query.isBlank()) return emptyList()
 
         val results = callRebrickable { rebrickable.searchSets(query.trim(), ordering = "-year", pageSize = SEARCH_PAGE_SIZE) }.results
         val themeNames = themeNames(results.map { it.themeId }.toSet())
-        val owned = legoSets.findSetNumbersIn(results.map { it.setNum }).toSet()
+        val owned = legoSets.findSetNumbersIn(user, results.map { it.setNum }).toSet()
 
         return results.map {
             CatalogSetResponse(
