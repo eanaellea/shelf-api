@@ -29,6 +29,10 @@ jobs:
   deploy:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # One deploy at a time, so a newer merge can't be overwritten by an older one finishing last.
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
