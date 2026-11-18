@@ -57,3 +57,8 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// Only build the runnable jar, so build/libs holds a single jar for the Dockerfile to copy.
+tasks.jar {
+    enabled = false
+}
