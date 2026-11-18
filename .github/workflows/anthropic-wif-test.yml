@@ -14,6 +14,8 @@ jobs:
           script: |
             const token = await core.getIDToken('https://api.anthropic.com');
             core.setSecret(token);
+            const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+            console.log({ sub: claims.sub, aud: claims.aud, iss: claims.iss });
             core.exportVariable('JWT', token);
       - name: Exchange for an Anthropic access token
         run: |
