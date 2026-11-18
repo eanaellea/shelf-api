@@ -1,5 +1,6 @@
 # Claude reviews each pull request when it's opened or updated, and leaves comments on it.
-# Needs the Claude GitHub app installed on the repo and an ANTHROPIC_API_KEY repository secret.
+# Needs the Claude GitHub app installed on the repo. Authenticates to Anthropic with the GitHub OIDC token
+# through a workload identity federation rule set up in the Claude Console, so no API key secret is needed.
 name: Claude review
 
 on:
@@ -20,7 +21,10 @@ jobs:
 
       - uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_federation_rule_id: fdrl_017EDAfqXbmbA1zH2qaEw289
+          anthropic_organization_id: 3429d742-3e74-450c-a76b-f7f1923bbafc
+          anthropic_service_account_id: svac_01FtYrgQTgE8kP9eJinXivS7
+          anthropic_workspace_id: wrkspc_01Q73PH7ngAfEtxE4TJzy5k7
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
