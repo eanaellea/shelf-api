@@ -10,6 +10,6 @@ data class CatalogSetResponse(
     val pieceCount: Int,
     /** Rebrickable CDN URL, or null when Rebrickable has no image. */
     val imageUrl: String?,
-    /** Whether the set is already on the shelf. */
+    /** Whether the set is already on the signed-in user's shelf. */
     val owned: Boolean,
 )

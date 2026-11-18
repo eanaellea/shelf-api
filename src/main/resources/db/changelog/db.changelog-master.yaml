@@ -7,3 +7,9 @@ databaseChangeLog:
   - include:
       file: changes/002-create-lego-sets.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/003-create-users.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/004-add-lego-sets-user.yaml
+      relativeToChangelogFile: true

@@ -13,12 +13,14 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 
 /**
- * The shelf is a public gift registry: anyone can browse it and mark a wishlisted set as gifted.
- * Everything else is reserved to the owner, identified by the Firebase ID token's subject (the user's UID).
+ * Each user's shelf is a public gift registry: anyone can browse it and mark a wishlisted set as gifted.
+ * Everything else needs a Firebase ID token, whose subject is the user's Firebase UID.
+ * Signed-in users must also have been invited: UserService answers 403 when they haven't.
+ * Inviting users is reserved to the admin.
  */
 @Configuration
 class SecurityConfig(
-    @Value("\${shelf.owner-uid}") private val ownerUid: String,
+    @Value("\${shelf.admin-uid}") private val adminUid: String,
 ) {
 
     @Bean
@@ -28,9 +30,10 @@ class SecurityConfig(
             csrf { disable() } // stateless API authenticated by bearer tokens, no cookies
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             authorizeHttpRequests {
-                authorize(HttpMethod.GET, "/api/lego-sets/**", permitAll)
-                authorize(HttpMethod.POST, "/api/lego-sets/*/gift", permitAll)
-                authorize("/api/**", owner)
+                authorize(HttpMethod.GET, "/api/shelves/**", permitAll)
+                authorize(HttpMethod.POST, "/api/shelves/*/lego-sets/*/gift", permitAll)
+                authorize("/api/admin/**", admin)
+                authorize("/api/**", authenticated)
                 authorize("/v3/api-docs/**", permitAll)
                 authorize("/swagger-ui.html", permitAll)
                 authorize("/swagger-ui/**", permitAll)
@@ -42,8 +45,8 @@ class SecurityConfig(
         return http.build()
     }
 
-    private val owner = AuthorizationManager<RequestAuthorizationContext> { authentication, _ ->
-        AuthorizationDecision(authentication.get()?.name == ownerUid)
+    private val admin = AuthorizationManager<RequestAuthorizationContext> { authentication, _ ->
+        AuthorizationDecision(authentication.get()?.name == adminUid)
     }
 
 }
