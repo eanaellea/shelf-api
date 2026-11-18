@@ -4,12 +4,12 @@ import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asOtherUser
 import dev.anaelleea.shelfapi.asOwner
+import dev.anaelleea.shelfapi.client.RebrickableApi
+import dev.anaelleea.shelfapi.client.RebrickableSet
+import dev.anaelleea.shelfapi.client.RebrickableTheme
 import dev.anaelleea.shelfapi.model.LegoSetStatus
 import dev.anaelleea.shelfapi.repository.LegoSetRepository
 import dev.anaelleea.shelfapi.repository.LegoThemeRepository
-import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
-import dev.anaelleea.shelfapi.rebrickable.RebrickableSet
-import dev.anaelleea.shelfapi.rebrickable.RebrickableTheme
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

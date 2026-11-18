@@ -1,4 +1,4 @@
-package dev.anaelleea.shelfapi.rebrickable
+package dev.anaelleea.shelfapi.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail

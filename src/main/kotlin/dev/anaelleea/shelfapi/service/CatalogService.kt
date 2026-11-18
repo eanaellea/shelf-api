@@ -1,11 +1,11 @@
 package dev.anaelleea.shelfapi.service
 
+import dev.anaelleea.shelfapi.client.RebrickableApi
 import dev.anaelleea.shelfapi.dto.CatalogSetResponse
 import dev.anaelleea.shelfapi.entity.LegoTheme
+import dev.anaelleea.shelfapi.exception.RebrickableUnavailableException
 import dev.anaelleea.shelfapi.repository.LegoSetRepository
 import dev.anaelleea.shelfapi.repository.LegoThemeRepository
-import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
-import dev.anaelleea.shelfapi.rebrickable.RebrickableUnavailableException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
