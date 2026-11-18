@@ -1,5 +1,6 @@
-package dev.anaelleea.shelfapi.legoset.model
+package dev.anaelleea.shelfapi.entity
 
+import dev.anaelleea.shelfapi.model.LegoSetStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType

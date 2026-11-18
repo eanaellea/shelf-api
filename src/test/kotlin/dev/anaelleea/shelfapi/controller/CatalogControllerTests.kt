@@ -1,13 +1,13 @@
-package dev.anaelleea.shelfapi.catalog.controller
+package dev.anaelleea.shelfapi.controller
 
 import dev.anaelleea.shelfapi.OWNER_UID_PROPERTY
 import dev.anaelleea.shelfapi.TestcontainersConfiguration
 import dev.anaelleea.shelfapi.asOwner
-import dev.anaelleea.shelfapi.legoset.model.LegoSet
-import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
-import dev.anaelleea.shelfapi.legoset.model.LegoTheme
-import dev.anaelleea.shelfapi.legoset.repository.LegoSetRepository
-import dev.anaelleea.shelfapi.legoset.repository.LegoThemeRepository
+import dev.anaelleea.shelfapi.entity.LegoSet
+import dev.anaelleea.shelfapi.model.LegoSetStatus
+import dev.anaelleea.shelfapi.entity.LegoTheme
+import dev.anaelleea.shelfapi.repository.LegoSetRepository
+import dev.anaelleea.shelfapi.repository.LegoThemeRepository
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
 import dev.anaelleea.shelfapi.rebrickable.RebrickablePage
 import dev.anaelleea.shelfapi.rebrickable.RebrickableSet

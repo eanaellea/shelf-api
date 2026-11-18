@@ -1,7 +1,7 @@
-package dev.anaelleea.shelfapi.legoset.repository
+package dev.anaelleea.shelfapi.repository
 
-import dev.anaelleea.shelfapi.legoset.model.LegoSet
-import dev.anaelleea.shelfapi.legoset.model.LegoSetStatus
+import dev.anaelleea.shelfapi.entity.LegoSet
+import dev.anaelleea.shelfapi.model.LegoSetStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph

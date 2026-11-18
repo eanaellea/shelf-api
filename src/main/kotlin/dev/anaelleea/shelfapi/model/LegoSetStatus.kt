@@ -1,4 +1,4 @@
-package dev.anaelleea.shelfapi.legoset.model
+package dev.anaelleea.shelfapi.model
 
 enum class LegoSetStatus {
     WISHLIST,

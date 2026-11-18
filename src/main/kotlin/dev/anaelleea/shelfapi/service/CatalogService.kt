@@ -1,9 +1,9 @@
-package dev.anaelleea.shelfapi.catalog.service
+package dev.anaelleea.shelfapi.service
 
-import dev.anaelleea.shelfapi.catalog.dto.CatalogSetResponse
-import dev.anaelleea.shelfapi.legoset.model.LegoTheme
-import dev.anaelleea.shelfapi.legoset.repository.LegoSetRepository
-import dev.anaelleea.shelfapi.legoset.repository.LegoThemeRepository
+import dev.anaelleea.shelfapi.dto.CatalogSetResponse
+import dev.anaelleea.shelfapi.entity.LegoTheme
+import dev.anaelleea.shelfapi.repository.LegoSetRepository
+import dev.anaelleea.shelfapi.repository.LegoThemeRepository
 import dev.anaelleea.shelfapi.rebrickable.RebrickableApi
 import dev.anaelleea.shelfapi.rebrickable.RebrickableUnavailableException
 import org.slf4j.Logger
