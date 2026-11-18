@@ -1,0 +1,95 @@
+databaseChangeLog:
+  # The sets on the shelf.
+  - changeSet:
+      id: 002-create-lego-sets
+      author: anaelle
+      changes:
+        - createTable:
+            tableName: lego_sets
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              # Rebrickable set_num, e.g. '10281-1'
+              - column:
+                  name: set_number
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: theme_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: lego_sets_theme_id_fkey
+                    references: lego_themes(id)
+              - column:
+                  name: release_year
+                  type: smallint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: piece_count
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image_url
+                  type: varchar(500)
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: added_at
+                  type: timestamp with time zone
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp with time zone
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  # Check constraints, in plain SQL.
+  - changeSet:
+      id: 002-add-lego-sets-checks
+      author: anaelle
+      changes:
+        - sql:
+            sql: >
+              alter table lego_sets
+              add constraint lego_sets_piece_count_check check (piece_count >= 0);
+              alter table lego_sets
+              add constraint lego_sets_status_check
+              check (status in ('WISHLIST', 'ORDERED', 'QUEUED', 'BUILT', 'GIFTED'));
+
+  # Indexes for filtering the shelf by status and by theme.
+  - changeSet:
+      id: 002-create-lego-sets-indexes
+      author: anaelle
+      changes:
+        - createIndex:
+            tableName: lego_sets
+            indexName: lego_sets_status_idx
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: lego_sets
+            indexName: lego_sets_theme_id_idx
+            columns:
+              - column:
+                  name: theme_id

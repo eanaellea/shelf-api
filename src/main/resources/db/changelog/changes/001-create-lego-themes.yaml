@@ -1,0 +1,19 @@
+databaseChangeLog:
+  # Themes come from Rebrickable, so the id is Rebrickable's theme_id.
+  - changeSet:
+      id: 001-create-lego-themes
+      author: anaelle
+      changes:
+        - createTable:
+            tableName: lego_themes
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
