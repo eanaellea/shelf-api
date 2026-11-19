@@ -13,7 +13,8 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 
 /**
- * Each user's shelf is a public gift registry: anyone can browse it and mark a wishlisted set as gifted.
+ * Each user's shelf is a public gift registry: anyone can browse it, see its set images
+ * and mark a wishlisted set as gifted.
  * Everything else needs a Firebase ID token, whose subject is the user's Firebase UID.
  * Signed-in users must also have been invited: UserService answers 403 when they haven't.
  * Inviting users is reserved to the admin.
@@ -32,6 +33,7 @@ class SecurityConfig(
             authorizeHttpRequests {
                 authorize(HttpMethod.GET, "/api/shelves/**", permitAll)
                 authorize(HttpMethod.POST, "/api/shelves/*/lego-sets/*/gift", permitAll)
+                authorize(HttpMethod.GET, "/api/images/**", permitAll)
                 authorize("/api/admin/**", admin)
                 authorize("/api/**", authenticated)
                 authorize("/v3/api-docs/**", permitAll)
