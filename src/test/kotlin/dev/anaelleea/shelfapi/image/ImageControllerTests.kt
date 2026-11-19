@@ -55,6 +55,20 @@ class ImageControllerTests @Autowired constructor(
     }
 
     @Test
+    fun `serves small versions of set images`() {
+        given(cdn.getSetThumbnail("10281-1", "148031.jpg"))
+            .willReturn(ResponseEntity.ok().contentType(MediaType.parseMediaType("image/jpeg; charset=utf-8")).body(jpeg))
+        given(cdn.getFlatSetThumbnail("8880-1.jpg"))
+            .willReturn(ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(jpeg))
+
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/sets/10281-1/148031.jpg")).hasStatusOk()
+            .hasHeader(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
+            .body().isEqualTo(jpeg)
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/sets/8880-1.jpg")).hasStatusOk()
+            .body().isEqualTo(jpeg)
+    }
+
+    @Test
     fun `lets the web app load images from its origin`() {
         given(cdn.getSetImage("10281-1", "148031.jpg"))
             .willReturn(ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(jpeg))

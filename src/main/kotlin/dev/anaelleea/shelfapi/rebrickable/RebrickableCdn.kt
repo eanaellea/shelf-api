@@ -16,4 +16,15 @@ interface RebrickableCdn {
     @GetExchange("/media/sets/{file}")
     fun getFlatSetImage(@PathVariable file: String): ResponseEntity<ByteArray>
 
+    /** The image at [getSetImage], at most [THUMBNAIL_SIZE] pixels: originals can be 2400 pixels wide and weigh megabytes. */
+    @GetExchange("/media/thumbs/sets/{setNumber}/{file}/$THUMBNAIL_SIZE.jpg")
+    fun getSetThumbnail(@PathVariable setNumber: String, @PathVariable file: String): ResponseEntity<ByteArray>
+
+    /** The image at [getFlatSetImage], at most [THUMBNAIL_SIZE] pixels. */
+    @GetExchange("/media/thumbs/sets/{file}/$THUMBNAIL_SIZE.jpg")
+    fun getFlatSetThumbnail(@PathVariable file: String): ResponseEntity<ByteArray>
+
 }
+
+/** Big enough for the app's largest set image (160 logical pixels) on a 3x screen. */
+const val THUMBNAIL_SIZE = "500x500p"
