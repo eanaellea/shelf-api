@@ -31,11 +31,18 @@ class ImageController(
     private val cdn: RebrickableCdn,
 ) {
 
-    @GetMapping("/rebrickable/sets/{setNumber:[\\w-]+}/{file:[\\w-]+\\.(?:jpg|jpeg|png)}")
-    @Operation(summary = "Get a set image from Rebrickable's CDN (cdn.rebrickable.com/media/sets/…)")
-    fun rebrickableSetImage(@PathVariable setNumber: String, @PathVariable file: String): ResponseEntity<ByteArray> {
+    @GetMapping("/rebrickable/sets/{setNumber:[\\w-]+}/{file:$IMAGE_FILE}")
+    @Operation(summary = "Get a set image from Rebrickable's CDN (cdn.rebrickable.com/media/sets/{set}/{file})")
+    fun rebrickableSetImage(@PathVariable setNumber: String, @PathVariable file: String) =
+        serve { cdn.getSetImage(setNumber, file) }
+
+    @GetMapping("/rebrickable/sets/{file:$IMAGE_FILE}")
+    @Operation(summary = "Get a set image from Rebrickable's CDN (cdn.rebrickable.com/media/sets/{file})")
+    fun rebrickableFlatSetImage(@PathVariable file: String) = serve { cdn.getFlatSetImage(file) }
+
+    private fun serve(fetch: () -> ResponseEntity<ByteArray>): ResponseEntity<ByteArray> {
         val image = try {
-            cdn.getSetImage(setNumber, file)
+            fetch()
         } catch (_: HttpClientErrorException.NotFound) {
             throw ImageNotFoundException()
         } catch (e: RestClientException) {
@@ -53,6 +60,7 @@ class ImageController(
     }
 
     private companion object {
+        const val IMAGE_FILE = "[\\w-]+\\.(?:jpg|jpeg|png)"
         val log: Logger = LoggerFactory.getLogger(ImageController::class.java)
     }
 

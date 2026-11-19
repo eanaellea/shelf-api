@@ -45,6 +45,16 @@ class ImageControllerTests @Autowired constructor(
     }
 
     @Test
+    fun `serves set images named after the set`() {
+        given(cdn.getFlatSetImage("8880-1.jpg"))
+            .willReturn(ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(jpeg))
+
+        assertThat(mvc.get().uri("/api/images/rebrickable/sets/8880-1.jpg")).hasStatusOk()
+            .hasContentType(MediaType.IMAGE_JPEG)
+            .body().isEqualTo(jpeg)
+    }
+
+    @Test
     fun `lets the web app load images from its origin`() {
         given(cdn.getSetImage("10281-1", "148031.jpg"))
             .willReturn(ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(jpeg))

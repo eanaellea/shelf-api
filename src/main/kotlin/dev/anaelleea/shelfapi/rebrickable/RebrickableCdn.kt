@@ -12,4 +12,8 @@ interface RebrickableCdn {
     @GetExchange("/media/sets/{setNumber}/{file}")
     fun getSetImage(@PathVariable setNumber: String, @PathVariable file: String): ResponseEntity<ByteArray>
 
+    /** Some sets, mostly older ones, have a single image named after the set, like `8880-1.jpg`. */
+    @GetExchange("/media/sets/{file}")
+    fun getFlatSetImage(@PathVariable file: String): ResponseEntity<ByteArray>
+
 }
