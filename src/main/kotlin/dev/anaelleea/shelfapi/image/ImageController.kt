@@ -2,12 +2,14 @@ package dev.anaelleea.shelfapi.image
 
 import dev.anaelleea.shelfapi.legoset.RebrickableUnavailableException
 import dev.anaelleea.shelfapi.rebrickable.RebrickableCdn
+import dev.anaelleea.shelfapi.rebrickable.THUMBNAIL_SIZE
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.CacheControl
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.ErrorResponseException
@@ -40,6 +42,15 @@ class ImageController(
     @Operation(summary = "Get a set image from Rebrickable's CDN (cdn.rebrickable.com/media/sets/{file})")
     fun rebrickableFlatSetImage(@PathVariable file: String) = serve { cdn.getFlatSetImage(file) }
 
+    @GetMapping("/rebrickable/thumbs/sets/{setNumber:[\\w-]+}/{file:$IMAGE_FILE}")
+    @Operation(summary = "Get a set image from Rebrickable's CDN, at most $THUMBNAIL_SIZE pixels")
+    fun rebrickableSetThumbnail(@PathVariable setNumber: String, @PathVariable file: String) =
+        serve { cdn.getSetThumbnail(setNumber, file) }
+
+    @GetMapping("/rebrickable/thumbs/sets/{file:$IMAGE_FILE}")
+    @Operation(summary = "Get a set image named after the set from Rebrickable's CDN, at most $THUMBNAIL_SIZE pixels")
+    fun rebrickableFlatSetThumbnail(@PathVariable file: String) = serve { cdn.getFlatSetThumbnail(file) }
+
     private fun serve(fetch: () -> ResponseEntity<ByteArray>): ResponseEntity<ByteArray> {
         val image = try {
             fetch()
@@ -53,7 +64,8 @@ class ImageController(
             ?: throw RebrickableUnavailableException(IllegalStateException("Not an image: ${image.headers.contentType}"))
 
         return ResponseEntity.ok()
-            .contentType(contentType)
+            // Thumbnails come as "image/jpeg; charset=utf-8", which means nothing for an image.
+            .contentType(MediaType(contentType.type, contentType.subtype))
             // Rebrickable gives each image version its own URL, so it never changes.
             .cacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic().immutable())
             .body(image.body)

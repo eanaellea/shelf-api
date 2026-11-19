@@ -55,6 +55,20 @@ class ImageControllerTests @Autowired constructor(
     }
 
     @Test
+    fun `serves small versions of set images`() {
+        given(cdn.getSetThumbnail("10281-1", "148031.jpg"))
+            .willReturn(ResponseEntity.ok().contentType(MediaType.parseMediaType("image/jpeg; charset=utf-8")).body(jpeg))
+        given(cdn.getFlatSetThumbnail("8880-1.jpg"))
+            .willReturn(ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(jpeg))
+
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/sets/10281-1/148031.jpg")).hasStatusOk()
+            .hasHeader(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
+            .body().isEqualTo(jpeg)
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/sets/8880-1.jpg")).hasStatusOk()
+            .body().isEqualTo(jpeg)
+    }
+
+    @Test
     fun `lets the web app load images from its origin`() {
         given(cdn.getSetImage("10281-1", "148031.jpg"))
             .willReturn(ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(jpeg))
@@ -67,6 +81,8 @@ class ImageControllerTests @Autowired constructor(
     fun `only fetches paths shaped like set images`() {
         assertThat(mvc.get().uri("/api/images/rebrickable/sets/10281-1/notes.txt")).hasStatus(HttpStatus.NOT_FOUND)
         assertThat(mvc.get().uri("/api/images/rebrickable/parts/10281-1/148031.jpg")).hasStatus(HttpStatus.NOT_FOUND)
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/sets/10281-1/notes.txt")).hasStatus(HttpStatus.NOT_FOUND)
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/parts/10281-1/148031.jpg")).hasStatus(HttpStatus.NOT_FOUND)
         verifyNoInteractions(cdn)
     }
 
