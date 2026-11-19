@@ -81,6 +81,8 @@ class ImageControllerTests @Autowired constructor(
     fun `only fetches paths shaped like set images`() {
         assertThat(mvc.get().uri("/api/images/rebrickable/sets/10281-1/notes.txt")).hasStatus(HttpStatus.NOT_FOUND)
         assertThat(mvc.get().uri("/api/images/rebrickable/parts/10281-1/148031.jpg")).hasStatus(HttpStatus.NOT_FOUND)
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/sets/10281-1/notes.txt")).hasStatus(HttpStatus.NOT_FOUND)
+        assertThat(mvc.get().uri("/api/images/rebrickable/thumbs/parts/10281-1/148031.jpg")).hasStatus(HttpStatus.NOT_FOUND)
         verifyNoInteractions(cdn)
     }
 
